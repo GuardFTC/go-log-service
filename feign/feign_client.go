@@ -97,8 +97,8 @@ func (f *Client) request(method, path string, body interface{}, result interface
 		return fmt.Errorf("读取响应失败:[%v]", err)
 	}
 
-	//6.如果响应状态码>=200并且<=226，返回错误
-	if resp.StatusCode >= http.StatusOK && resp.StatusCode < http.StatusIMUsed {
+	//6.如果响应状态码不为2XX，返回错误
+	if !(resp.StatusCode >= http.StatusOK && resp.StatusCode < http.StatusIMUsed) {
 		return fmt.Errorf("请求失败,状态码:[%d],响应:[%s]", resp.StatusCode, string(respBody))
 	}
 

@@ -3,6 +3,8 @@ package web
 
 import (
 	"fmt"
+	"log"
+	"logging-mon-service/commmon/task"
 	"logging-mon-service/nacos"
 	"net/http"
 
@@ -63,6 +65,18 @@ func getServiceInstances(c *gin.Context) {
 			"message": "服务名称不能为空",
 		})
 		return
+	}
+
+	logServerService := task.NewLogServerService()
+	logServerObj, err := logServerService.GetLogServerObj()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"code":    500,
+			"message": fmt.Sprintf("获取服务对象失败: %v", err),
+		})
+		return
+	} else {
+		log.Printf("logServerObj: %v", logServerObj)
 	}
 
 	instances, err := nacos.Nm.GetServiceInstances(serviceName)
