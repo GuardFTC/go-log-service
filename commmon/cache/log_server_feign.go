@@ -1,5 +1,5 @@
 // Package task @Author:冯铁城 [17615007230@163.com] 2025-12-30 14:27:29
-package task
+package cache
 
 import (
 	"logging-mon-service/feign"

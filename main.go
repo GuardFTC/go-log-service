@@ -2,6 +2,7 @@
 package main
 
 import (
+	"logging-mon-service/commmon/cache"
 	"logging-mon-service/config"
 	"logging-mon-service/nacos"
 	"logging-mon-service/web"
@@ -15,6 +16,10 @@ func main() {
 	//2.初始化Nacos管理器
 	nacos.InitNacosManager(c)
 
-	//3.启动服务器
+	//3.初始化日志服务缓存
+	cache.InitLogServerCache()
+	defer cache.StopLogServerCache()
+
+	//4.启动服务器
 	web.StartServer(c)
 }

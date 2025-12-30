@@ -4,7 +4,7 @@ package web
 import (
 	"fmt"
 	"log"
-	"logging-mon-service/commmon/task"
+	"logging-mon-service/commmon/cache"
 	"logging-mon-service/nacos"
 	"net/http"
 
@@ -67,7 +67,7 @@ func getServiceInstances(c *gin.Context) {
 		return
 	}
 
-	logServerService := task.NewLogServerService()
+	logServerService := cache.NewLogServerService()
 	logServerObj, err := logServerService.GetLogServerObj()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -78,6 +78,9 @@ func getServiceInstances(c *gin.Context) {
 	} else {
 		log.Printf("logServerObj: %v", logServerObj)
 	}
+
+	project := cache.GetProject(1)
+	log.Printf("project: %v", project)
 
 	instances, err := nacos.Nm.GetServiceInstances(serviceName)
 	if err != nil {
