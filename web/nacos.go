@@ -5,9 +5,6 @@ import (
 	"fmt"
 	"log"
 	"logging-mon-service/config"
-	"os"
-	"os/signal"
-	"syscall"
 
 	"github.com/nacos-group/nacos-sdk-go/v2/clients"
 	"github.com/nacos-group/nacos-sdk-go/v2/clients/naming_client"
@@ -119,34 +116,6 @@ func (nm *NacosManager) DeregisterService() error {
 
 	//4.默认返回空异常
 	return nil
-}
-
-// StartGracefulShutdown 启动优雅关闭监听
-func (nm *NacosManager) StartGracefulShutdown() {
-
-	//1.创建信号通道
-	c := make(chan os.Signal, 1)
-
-	//2.监听退出信号
-	signal.Notify(c, syscall.SIGTERM, syscall.SIGINT)
-
-	//3.创建协程，等待退出信号
-	go func() {
-
-		//4.阻塞等待信号通道写入退出信号
-		<-c
-
-		//5.打印日志
-		log.Println("[Nacos] 接收到关闭信号，开始注销服务...")
-
-		//6.注销服务
-		if err := nm.DeregisterService(); err != nil {
-			log.Printf("注销服务失败: [%v]", err)
-		}
-
-		//7.退出
-		os.Exit(0)
-	}()
 }
 
 // GetAllServices 获取所有服务列表

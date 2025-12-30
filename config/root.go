@@ -3,6 +3,7 @@ package config
 
 import (
 	"encoding/json"
+	"log"
 	"os"
 )
 
@@ -13,31 +14,30 @@ type Config struct {
 }
 
 // LoadConfig 加载配置文件
-func LoadConfig() (*Config, error) {
+func LoadConfig() *Config {
 
 	//1.读取配置文件
 	file, err := os.Open("config/properties/config-local.json")
 	if err != nil {
-		return nil, err
+		log.Fatalf("[Config] 加载配置失败: %v", err)
 	}
 	defer file.Close()
 
 	//2.解析为结构体
 	var config Config
 	if err = json.NewDecoder(file).Decode(&config); err != nil {
-		return nil, err
+		log.Fatalf("[Config] 加载配置失败: %v", err)
 	}
 
 	//3.解析服务器配置
 	if err = parseServerConfig(&config); err != nil {
-		return nil, err
+		log.Fatalf("[Config] 加载配置失败: %v", err)
 	}
 
 	//4.解析Nacos配置
-	if err = parseNacosConfig(&config); err != nil {
-		return nil, err
-	}
+	parseNacosConfig(&config)
 
 	//5.返回配置
-	return &config, nil
+	log.Printf("[Config] 配置加载成功: [%+v]", config)
+	return &config
 }

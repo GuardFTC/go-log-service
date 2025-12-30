@@ -17,13 +17,10 @@ type NacosConfig struct {
 }
 
 // parseNacosConfig 加载服务配置
-func parseNacosConfig(c *Config) error {
+func parseNacosConfig(c *Config) {
 
 	//1.如果环境变量中存在NACOS_ADDR，则覆盖Nacos地址
 	if envNacosAddr := os.Getenv("NACOS_ADDR"); envNacosAddr != "" {
 		c.Nacos.ServerAddr = envNacosAddr
 	}
-
-	//2.返回
-	return nil
 }
