@@ -8,7 +8,7 @@
   "nacos": {
     "server_addr": "127.0.0.1",
     "server_port": 8848,
-    "namespace": "public",
+    "namespace": "868e232c-e785-4ad9-8f11-de0a22a865ca",
     "group": "DEFAULT_GROUP",
     "timeout": 5000,
     "log_dir": "./logs/nacos",

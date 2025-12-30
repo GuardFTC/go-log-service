@@ -3,14 +3,18 @@ package main
 
 import (
 	"logging-mon-service/config"
+	"logging-mon-service/nacos"
 	"logging-mon-service/web"
 )
 
 func main() {
 
 	//1.加载配置
-	c := config.LoadConfig()
+	c := config.InitConfig()
 
-	//2.启动服务器
+	//2.初始化Nacos管理器
+	nacos.InitNacosManager(c)
+
+	//3.启动服务器
 	web.StartServer(c)
 }

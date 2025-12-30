@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"log"
 	"logging-mon-service/config"
+	"logging-mon-service/nacos"
 	"net/http"
 	"os"
 	"os/signal"
@@ -34,23 +35,15 @@ func StartServer(c *config.Config) {
 		}
 	}()
 
-	//4.初始化Nacos管理器
-	nm, err := NewNacosManager(c)
-	if err != nil {
-		log.Fatalf("[Nacos] 初始化管理器失败: [%v]", err)
-	}
+	//4.注册服务到Nacos
+	nacos.RegisterService()
 
-	//5.注册服务到Nacos
-	if err = nm.RegisterService(); err != nil {
-		log.Fatalf("[Nacos] 注册服务失败: [%v]", err)
-	}
-
-	//6.优雅关闭服务器
-	waitForShutdown(server, nm)
+	//5.优雅关闭服务器
+	waitForShutdown(server)
 }
 
 // waitForShutdown 优雅关闭服务器
-func waitForShutdown(server *http.Server, nm *NacosManager) {
+func waitForShutdown(server *http.Server) {
 
 	//1.创建信号通道
 	quit := make(chan os.Signal, 1)
@@ -66,10 +59,8 @@ func waitForShutdown(server *http.Server, nm *NacosManager) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	//5.先从Nacos注销服务
-	if err := nm.DeregisterService(); err != nil {
-		log.Printf("[Nacos] 注销服务失败: [%v]", err)
-	}
+	//5.将服务从Nacos注销
+	nacos.DeregisterService()
 
 	//6.关闭HTTP服务器，等待现有连接完成
 	if err := server.Shutdown(ctx); err != nil {

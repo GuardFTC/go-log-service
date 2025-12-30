@@ -3,13 +3,13 @@ package web
 
 import (
 	"fmt"
+	"logging-mon-service/nacos"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
 
 // 全局Nacos管理器
-var nacosManager *NacosManager
 
 // uploadLog 上传日志接口
 func uploadLog(c *gin.Context) {
@@ -22,7 +22,7 @@ func uploadLog(c *gin.Context) {
 
 // getServices 获取服务列表接口
 func getServices(c *gin.Context) {
-	if nacosManager == nil {
+	if nacos.Nm == nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"code":    500,
 			"message": "Nacos管理器未初始化",
@@ -30,7 +30,7 @@ func getServices(c *gin.Context) {
 		return
 	}
 
-	services, err := nacosManager.GetAllServices()
+	services, err := nacos.Nm.GetAllServices()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"code":    500,
@@ -48,7 +48,7 @@ func getServices(c *gin.Context) {
 
 // getServiceInstances 获取指定服务的实例列表
 func getServiceInstances(c *gin.Context) {
-	if nacosManager == nil {
+	if nacos.Nm == nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"code":    500,
 			"message": "Nacos管理器未初始化",
@@ -65,7 +65,7 @@ func getServiceInstances(c *gin.Context) {
 		return
 	}
 
-	instances, err := nacosManager.GetServiceInstances(serviceName)
+	instances, err := nacos.Nm.GetServiceInstances(serviceName)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"code":    500,
