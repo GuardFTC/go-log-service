@@ -11,7 +11,7 @@ func initRouter() *gin.Engine {
 
 	//2.绑定上传日志handler
 	logsGroup := router.Group("/api/logs")
-	logsGroup.POST("", uploadLog)
+	logsGroup.POST("", uploadLogsAsync)
 
 	//3.绑定获取服务列表handler
 	nacosGroup := router.Group("/api/nacos")
