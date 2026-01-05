@@ -6,6 +6,7 @@ import (
 	"log"
 	"logging-mon-service/commmon/cache"
 	"logging-mon-service/commmon/enum"
+	"logging-mon-service/commmon/util/message"
 	"logging-mon-service/model"
 	"logging-mon-service/model/res"
 	"net/http"
@@ -79,5 +80,17 @@ func uploadLogs(logDto model.LogDto, projectId string, loggerId string) {
 		return
 	}
 
-	fmt.Println(1)
+	//7.获取消息处理器
+	messageHandler := message.Factory.GetMessageHandler(message.KafkaConnector)
+
+	//8.获取Kafka消息
+	messages := messageHandler.GetMessages(cast.ToInt(projectId), logItems, 1000)
+
+	//9.为空直接返回
+	if len(messages) == 0 {
+		log.Printf("[上传日志] 项目[%v]解析Kafka消息为空", projectId)
+		return
+	}
+
+	fmt.Println(messages)
 }

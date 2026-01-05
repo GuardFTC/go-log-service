@@ -3,6 +3,7 @@ package main
 
 import (
 	"logging-mon-service/commmon/cache"
+	"logging-mon-service/commmon/util/message"
 	"logging-mon-service/config"
 	"logging-mon-service/nacos"
 	"logging-mon-service/web"
@@ -20,6 +21,9 @@ func main() {
 	cache.InitLogServerCache()
 	defer cache.StopLogServerCache()
 
-	//4.启动服务器
+	//4.初始化消息处理器
+	message.Init()
+
+	//5.启动服务器
 	web.StartServer(c)
 }
