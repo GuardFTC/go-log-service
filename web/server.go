@@ -19,7 +19,7 @@ import (
 func StartServer(c *config.Config) {
 
 	//1.初始化路由
-	router := initRouter()
+	router := initRouter(c)
 
 	//2.创建HTTP服务器
 	server := &http.Server{

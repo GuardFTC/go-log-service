@@ -9,8 +9,9 @@ import (
 
 // Config 应用配置
 type Config struct {
-	Server ServerConfig `json:"server"` // 服务配置
-	Nacos  NacosConfig  `json:"nacos"`  // Nacos配置
+	Server  ServerConfig  `json:"server"`  // 服务配置
+	Nacos   NacosConfig   `json:"nacos"`   // Nacos配置
+	Message MessageConfig `json:"message"` // 消息配置
 }
 
 // InitConfig 初始化配置文件
@@ -37,7 +38,10 @@ func InitConfig() *Config {
 	//4.解析Nacos配置
 	parseNacosConfig(&config)
 
-	//5.返回配置
+	//5.解析消息配置
+	parseMessageConfig(&config)
+
+	//6.返回配置
 	log.Printf("[Config] 配置加载成功: [%+v]", config)
 	return &config
 }

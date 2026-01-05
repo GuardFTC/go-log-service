@@ -13,5 +13,8 @@
     "timeout": 5000,
     "log_dir": "./logs/nacos",
     "cache_dir": "./cache/nacos"
+  },
+  "message": {
+    "handler_type": "routine_load"
   }
 }

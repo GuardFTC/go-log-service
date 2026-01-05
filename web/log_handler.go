@@ -7,6 +7,7 @@ import (
 	"logging-mon-service/commmon/cache"
 	"logging-mon-service/commmon/enum"
 	"logging-mon-service/commmon/util/message"
+	"logging-mon-service/config"
 	"logging-mon-service/model"
 	"logging-mon-service/model/res"
 	"net/http"
@@ -15,8 +16,11 @@ import (
 	"github.com/spf13/cast"
 )
 
+// maxMessageSize 最大消息大小
+const maxMessageSize = 1024 * 1024
+
 // uploadLogsAsync 上传日志接口
-func uploadLogsAsync(c *gin.Context) {
+func uploadLogsAsync(c *gin.Context, cfg *config.Config) {
 
 	//1.声明结构体参数
 	var logDto model.LogDto
@@ -42,14 +46,14 @@ func uploadLogsAsync(c *gin.Context) {
 	}
 
 	//5.上传日志
-	uploadLogs(logDto, projectId, loggerId)
+	uploadLogs(logDto, projectId, loggerId, cfg)
 
 	//6.返回
 	c.JSON(http.StatusOK, res.CreateSuccess(logDto))
 }
 
 // uploadLogs 上传日志
-func uploadLogs(logDto model.LogDto, projectId string, loggerId string) {
+func uploadLogs(logDto model.LogDto, projectId string, loggerId string, cfg *config.Config) {
 
 	//1.获取项目
 	project := cache.GetProject(cast.ToInt(projectId))
@@ -81,10 +85,10 @@ func uploadLogs(logDto model.LogDto, projectId string, loggerId string) {
 	}
 
 	//7.获取消息处理器
-	messageHandler := message.Factory.GetMessageHandler(message.RoutineLoad)
+	messageHandler := message.Factory.GetMessageHandler(cfg.Message.HandlerType)
 
 	//8.获取Kafka消息
-	messages := messageHandler.GetMessages(cast.ToInt(projectId), logItems, 1000)
+	messages := messageHandler.GetMessages(cast.ToInt(projectId), logItems, maxMessageSize)
 
 	//9.为空直接返回
 	if len(messages) == 0 {
