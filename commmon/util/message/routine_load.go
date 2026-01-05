@@ -11,25 +11,25 @@ import (
 )
 
 const (
-	DefaultMessagePrefix     = "project_logs_%v|"        // 默认消息前缀模版
-	DefaultMessagePrefixSize = len(DefaultMessagePrefix) // 默认消息前缀模版长度
+	defaultMessagePrefix     = "project_logs_%v|"        // 默认消息前缀模版
+	defaultMessagePrefixSize = len(defaultMessagePrefix) // 默认消息前缀模版长度
 )
 
-// RoutineLoadMessage RoutineLoad消息
-type RoutineLoadMessage struct{}
+// routineLoadMessage RoutineLoad消息
+type routineLoadMessage struct{}
 
-// NewRoutineLoadMessage 创建RoutineLoad消息
-func NewRoutineLoadMessage() *RoutineLoadMessage {
-	return &RoutineLoadMessage{}
+// newRoutineLoadMessage 创建RoutineLoad消息
+func newRoutineLoadMessage() *routineLoadMessage {
+	return &routineLoadMessage{}
 }
 
 // GetType 获取消息类型
-func (r *RoutineLoadMessage) GetType() string {
+func (r *routineLoadMessage) getType() string {
 	return RoutineLoad
 }
 
 // GetMessages 获取消息
-func (r *RoutineLoadMessage) GetMessages(projectId int, logItems []model.LogItemDto, maxSize int) []string {
+func (r *routineLoadMessage) GetMessages(projectId int, logItems []model.LogItemDto, maxSize int) []string {
 
 	//1.日志项转换为LogMessage
 	logMessages := make([]*model.LogMessage, 0)
@@ -54,7 +54,7 @@ func (r *RoutineLoadMessage) GetMessages(projectId int, logItems []model.LogItem
 	}
 
 	//5.判定大小，未达到最大值，直接返回
-	if len(messageByte)+DefaultMessagePrefixSize < maxSize {
+	if len(messageByte)+defaultMessagePrefixSize < maxSize {
 		return r.appendPrefixForMessage(projectId, []string{string(messageByte)})
 	}
 
@@ -63,7 +63,7 @@ func (r *RoutineLoadMessage) GetMessages(projectId int, logItems []model.LogItem
 }
 
 // toLogMessage 转换为日志消息
-func (r *RoutineLoadMessage) toLogMessage(logItem model.LogItemDto, projectId int) (*model.LogMessage, error) {
+func (r *routineLoadMessage) toLogMessage(logItem model.LogItemDto, projectId int) (*model.LogMessage, error) {
 
 	//1.创建logMessage
 	logMessage := model.NewLogMessage()
@@ -81,7 +81,7 @@ func (r *RoutineLoadMessage) toLogMessage(logItem model.LogItemDto, projectId in
 }
 
 // splitMessageByMaxLength 按最大长度分割消息
-func (r *RoutineLoadMessage) splitMessageByMaxLength(logMessages []*model.LogMessage, maxSize int) []string {
+func (r *routineLoadMessage) splitMessageByMaxLength(logMessages []*model.LogMessage, maxSize int) []string {
 
 	//1.定义结果集消息切片
 	result := make([]string, 0)
@@ -99,7 +99,7 @@ func (r *RoutineLoadMessage) splitMessageByMaxLength(logMessages []*model.LogMes
 		currentMessagesByte, _ := json.Marshal(currentMessages)
 
 		//6.检查当前批次大小
-		if len(currentMessagesByte)+DefaultMessagePrefixSize > maxSize {
+		if len(currentMessagesByte)+defaultMessagePrefixSize > maxSize {
 
 			//7.如果只有一个消息，且批次大小超出最大限制
 			if len(currentMessages) == 1 {
@@ -144,7 +144,7 @@ func (r *RoutineLoadMessage) splitMessageByMaxLength(logMessages []*model.LogMes
 }
 
 // appendPrefixForMessage 添加消息前缀
-func (r *RoutineLoadMessage) appendPrefixForMessage(projectId int, messages []string) []string {
+func (r *routineLoadMessage) appendPrefixForMessage(projectId int, messages []string) []string {
 
 	//1.定义结果集
 	result := make([]string, 0)
@@ -153,7 +153,7 @@ func (r *RoutineLoadMessage) appendPrefixForMessage(projectId int, messages []st
 	for _, message := range messages {
 
 		//3.添加消息前缀
-		appendPrefixMessage := fmt.Sprintf(DefaultMessagePrefix, projectId) + message
+		appendPrefixMessage := fmt.Sprintf(defaultMessagePrefix, projectId) + message
 
 		//4.存入结果集
 		result = append(result, appendPrefixMessage)

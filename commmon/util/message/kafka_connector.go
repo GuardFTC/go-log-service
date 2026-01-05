@@ -9,21 +9,21 @@ import (
 	"github.com/jinzhu/copier"
 )
 
-// KafkaConnectorMessage Doris Kafka Connector消息
-type KafkaConnectorMessage struct{}
+// kafkaConnectorMessage Doris Kafka Connector消息
+type kafkaConnectorMessage struct{}
 
-// NewKafkaConnectorMessage 创建Doris Kafka Connector消息
-func NewKafkaConnectorMessage() *KafkaConnectorMessage {
-	return &KafkaConnectorMessage{}
+// newKafkaConnectorMessage 创建Doris Kafka Connector消息
+func newKafkaConnectorMessage() *kafkaConnectorMessage {
+	return &kafkaConnectorMessage{}
 }
 
 // GetType 获取消息类型
-func (k *KafkaConnectorMessage) GetType() string {
+func (k *kafkaConnectorMessage) getType() string {
 	return KafkaConnector
 }
 
 // GetMessages 获取消息
-func (k *KafkaConnectorMessage) GetMessages(projectId int, logItems []model.LogItemDto, maxSize int) []string {
+func (k *kafkaConnectorMessage) GetMessages(projectId int, logItems []model.LogItemDto, maxSize int) []string {
 
 	//1.日志项转换为LogMessage
 	logMessages := make([]*model.LogMessage, 0)
@@ -57,7 +57,7 @@ func (k *KafkaConnectorMessage) GetMessages(projectId int, logItems []model.LogI
 }
 
 // toLogMessage 转换为日志消息
-func (k *KafkaConnectorMessage) toLogMessage(logItem model.LogItemDto, projectId int) (*model.LogMessage, error) {
+func (k *kafkaConnectorMessage) toLogMessage(logItem model.LogItemDto, projectId int) (*model.LogMessage, error) {
 
 	//1.创建logMessage
 	logMessage := model.NewLogMessage()
@@ -78,7 +78,7 @@ func (k *KafkaConnectorMessage) toLogMessage(logItem model.LogItemDto, projectId
 }
 
 // splitMessageByMaxLength 按最大长度分割消息
-func (k *KafkaConnectorMessage) splitMessageByMaxLength(logMessages []*model.LogMessage, maxSize int) []string {
+func (k *kafkaConnectorMessage) splitMessageByMaxLength(logMessages []*model.LogMessage, maxSize int) []string {
 
 	//1.定义结果集消息切片
 	result := make([]string, 0)

@@ -14,7 +14,7 @@ const (
 
 // IMessage 消息接口
 type IMessage interface {
-	GetType() string                                                              // 获取消息类型
+	getType() string                                                              // 获取消息类型
 	GetMessages(projectId int, logItems []model.LogItemDto, maxSize int) []string // 获取消息
 }
 
@@ -35,8 +35,8 @@ func Init() {
 	}
 
 	//2.存入处理器
-	Factory.handlerMap[KafkaConnector] = NewKafkaConnectorMessage()
-	Factory.handlerMap[RoutineLoad] = NewRoutineLoadMessage()
+	Factory.handlerMap[KafkaConnector] = newKafkaConnectorMessage()
+	Factory.handlerMap[RoutineLoad] = newRoutineLoadMessage()
 
 	//3.打印日志
 	log.Println("[Kafka Message] 消息处理工厂初始化完成")

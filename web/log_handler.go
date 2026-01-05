@@ -81,7 +81,7 @@ func uploadLogs(logDto model.LogDto, projectId string, loggerId string) {
 	}
 
 	//7.获取消息处理器
-	messageHandler := message.Factory.GetMessageHandler(message.KafkaConnector)
+	messageHandler := message.Factory.GetMessageHandler(message.RoutineLoad)
 
 	//8.获取Kafka消息
 	messages := messageHandler.GetMessages(cast.ToInt(projectId), logItems, 1000)
