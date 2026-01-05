@@ -9,11 +9,15 @@ func initRouter() *gin.Engine {
 	//1.初始化路由
 	router := gin.Default()
 
-	//2.绑定handler
-	router.POST("/api/logs", uploadLog)
-	router.GET("/api/services", getServices)                                // 获取所有服务列表
-	router.GET("/api/services/:serviceName/instances", getServiceInstances) // 获取指定服务实例
+	//2.绑定上传日志handler
+	logsGroup := router.Group("/api/logs")
+	logsGroup.POST("", uploadLog)
 
-	//3.返回
+	//3.绑定获取服务列表handler
+	nacosGroup := router.Group("/api/nacos")
+	nacosGroup.GET("services", getServices)
+	nacosGroup.GET("services/:serviceName/instances", getServiceInstances)
+
+	//4.返回
 	return router
 }
