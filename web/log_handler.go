@@ -106,8 +106,14 @@ func uploadLogs(logDto model.LogDto, projectId string, loggerId string, cfg *con
 	for _, kafkaMessage := range messages {
 
 		//12.发送消息
+		//发送失败，写入文件
+		//发送成功，打印日志
 		if err := kafka.GlobalProducer.SendMassage(cfg.Kafka.Topic, kafkaMessage); err != nil {
-			logrus.Errorf("[上传日志] 项目[%v]发送Kafka消息:[%v]失败:[%v]", projectId, kafkaMessage, err)
+			if file, e := message.WriteMessageFile(kafkaMessage); e != nil {
+				logrus.Errorf("[上传日志] 项目[%v]发送Kafka消息:[%v] 失败:[%v] 写入文件失败:[%v]", projectId, kafkaMessage, err, e)
+			} else {
+				logrus.Errorf("[上传日志] 项目[%v]发送Kafka消息:[%v] 失败:[%v] 写入文件成功:[%v]", projectId, kafkaMessage, err, file)
+			}
 		} else {
 			logrus.Debugf("[上传日志] 项目[%v]发送Kafka消息:[%v]成功", projectId, kafkaMessage)
 		}
