@@ -36,6 +36,7 @@
   },
   "log": {
     "level": "info",
-    "color": true
+    "color": true,
+    "format": "text"
   }
 }
