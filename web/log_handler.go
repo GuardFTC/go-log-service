@@ -2,11 +2,11 @@
 package web
 
 import (
-	"fmt"
 	"logging-mon-service/commmon/cache"
 	"logging-mon-service/commmon/enum"
 	"logging-mon-service/commmon/util/message"
 	"logging-mon-service/config"
+	"logging-mon-service/kafka"
 	"logging-mon-service/model"
 	"logging-mon-service/model/res"
 	"net/http"
@@ -96,5 +96,20 @@ func uploadLogs(logDto model.LogDto, projectId string, loggerId string, cfg *con
 		return
 	}
 
-	fmt.Println(messages)
+	//10.判定topic是否为空
+	if cfg.Kafka.Topic == "" {
+		logrus.Warnf("[上传日志] 项目[%v]Kafka Topic为空", projectId)
+		return
+	}
+
+	//11.循环发送消息
+	for _, kafkaMessage := range messages {
+
+		//12.发送消息
+		if err := kafka.GlobalProducer.SendMassage(cfg.Kafka.Topic, kafkaMessage); err != nil {
+			logrus.Errorf("[上传日志] 项目[%v]发送Kafka消息:[%v]失败:[%v]", projectId, kafkaMessage, err)
+		} else {
+			logrus.Debugf("[上传日志] 项目[%v]发送Kafka消息:[%v]成功", projectId, kafkaMessage)
+		}
+	}
 }

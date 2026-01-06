@@ -32,7 +32,8 @@
     "batch_timeout": 100,
     "batch_bytes": 1048576,
     "dial_timeout": 5,
-    "idle_timeout": 300
+    "idle_timeout": 300,
+    "topic": "logging_mon_logs_rl_json_go"
   },
   "log": {
     "level": "info",

@@ -33,6 +33,9 @@ type KafkaConfig struct {
 	//网络配置
 	DialTimeout int `json:"dial_timeout"` // 连接超时(秒)
 	IdleTimeout int `json:"idle_timeout"` // 空闲超时(秒)
+
+	//发送主题
+	Topic string `json:"topic"`
 }
 
 // parseKafkaConfig 解析Kafka配置
@@ -123,7 +126,12 @@ func parseKafkaConfig(c *Config) {
 		}
 	}
 
-	//14.设置默认值
+	//14.解析主题
+	if envTopic := os.Getenv("KAFKA_TOPIC"); envTopic != "" {
+		c.Kafka.Topic = envTopic
+	}
+
+	//15.设置默认值
 	setKafkaDefaults(&c.Kafka)
 }
 
