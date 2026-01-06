@@ -113,7 +113,7 @@ func sendMessage(topic string, partition int, key string, message string, w *kaf
 	logrus.Debugf("[Kafka] Producer 发送消息[topic=%s partition=%d key=%s]成功", topic, partition, key)
 
 	//5.默认返回
-	return errors.New("测试异常")
+	return nil
 }
 
 // sendMessageBatch 批量发送消息
