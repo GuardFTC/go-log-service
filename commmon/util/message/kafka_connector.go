@@ -3,10 +3,10 @@ package message
 
 import (
 	"encoding/json"
-	"log"
 	"logging-mon-service/model"
 
 	"github.com/jinzhu/copier"
+	"github.com/sirupsen/logrus"
 )
 
 // kafkaConnectorMessage Doris Kafka Connector消息
@@ -32,7 +32,7 @@ func (k *kafkaConnectorMessage) GetMessages(projectId int, logItems []model.LogI
 		//2.消息转换
 		logMessage, err := k.toLogMessage(logItem, projectId)
 		if err != nil {
-			log.Printf("[上传日志] Doris Kafka Connector 转换日志失败: %v", err)
+			logrus.Errorf("[上传日志] Doris Kafka Connector 转换日志失败: %v", err)
 			continue
 		}
 
@@ -43,7 +43,7 @@ func (k *kafkaConnectorMessage) GetMessages(projectId int, logItems []model.LogI
 	//4.JSON序列化
 	messageByte, err := json.Marshal(logMessages)
 	if err != nil {
-		log.Printf("[上传日志] Doris Kafka Connector 序列化对象失败: %v", err)
+		logrus.Errorf("[上传日志] Doris Kafka Connector 序列化对象失败: %v", err)
 		return nil
 	}
 
@@ -102,7 +102,7 @@ func (k *kafkaConnectorMessage) splitMessageByMaxLength(logMessages []*model.Log
 			if len(currentMessages) == 1 {
 
 				//8.打印日志
-				log.Printf("[上传日志] Doris Kafka Connector 单条消息超出最大%v字节限制", maxSize)
+				logrus.Warnf("[上传日志] Doris Kafka Connector 单条消息超出最大%v字节限制", maxSize)
 
 				//9.清空当前批次
 				currentMessages = make([]*model.LogMessage, 0)

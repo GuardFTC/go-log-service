@@ -2,8 +2,9 @@
 package message
 
 import (
-	"log"
 	"logging-mon-service/model"
+
+	"github.com/sirupsen/logrus"
 )
 
 // 消息类型常量
@@ -39,7 +40,7 @@ func InitMessageHandlerFactory() {
 	Factory.handlerMap[RoutineLoad] = newRoutineLoadMessage()
 
 	//3.打印日志
-	log.Println("[Kafka Message] 消息处理工厂初始化完成")
+	logrus.Infof("[工厂容器] 消息处理工厂初始化完成")
 }
 
 // GetMessageHandler 获取消息处理器
@@ -51,6 +52,6 @@ func (h *HandlerFactory) GetMessageHandler(handlerType string) IMessage {
 	}
 
 	//2.否则不存在，打印错误信息并返回nil
-	log.Printf("[上传日志] 消息处理器[%v]不存在", handlerType)
+	logrus.Errorf("[上传日志] 消息处理器[%v]不存在", handlerType)
 	return nil
 }

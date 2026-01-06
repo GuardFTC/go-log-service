@@ -5,12 +5,13 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"log"
 	"logging-mon-service/model"
 	"os"
 	"path/filepath"
 	"sync"
 	"time"
+
+	"github.com/sirupsen/logrus"
 )
 
 // LogServerCacheManager 日志服务缓存管理器
@@ -69,7 +70,7 @@ func (m *LogServerCacheManager) Start() {
 	}()
 
 	//3.打印日志
-	log.Printf("[内存缓存-LogServer] 定时更新任务已启动，间隔30秒")
+	logrus.Infof("[内存缓存-LogServer] 定时更新任务已启动，间隔30秒")
 }
 
 // Stop 停止定时更新任务
@@ -84,7 +85,7 @@ func (m *LogServerCacheManager) Stop() {
 	m.cancel()
 
 	//3.打印日志
-	log.Printf("[内存缓存-LogServer] 定时更新任务已停止")
+	logrus.Infof("[内存缓存-LogServer] 定时更新任务已停止")
 }
 
 // GetLogServerObj 获取日志服务对象（从内存缓存）
@@ -131,7 +132,7 @@ func (m *LogServerCacheManager) initialize() {
 		m.mutex.Unlock()
 
 		//3.打印日志，返回
-		log.Printf("[内存缓存-LogServer] 从缓存文件加载成功")
+		logrus.Infof("[内存缓存-LogServer] 从缓存文件加载成功")
 		return
 	}
 
@@ -147,9 +148,9 @@ func (m *LogServerCacheManager) initialize() {
 		m.saveToFile(obj)
 
 		//7.打印日志，返回
-		log.Printf("[内存缓存-LogServer] 从HTTP接口初始化成功")
+		logrus.Infof("[内存缓存-LogServer] 从HTTP接口初始化成功")
 	} else {
-		log.Printf("[内存缓存-LogServer] 初始化失败:[%v]", err)
+		logrus.Errorf("[内存缓存-LogServer] 初始化失败:[%v]", err)
 	}
 }
 
@@ -164,14 +165,14 @@ func (m *LogServerCacheManager) readFromFile() *model.LogServerObj {
 	//2.读取文件内容
 	data, err := os.ReadFile(m.cacheFile)
 	if err != nil {
-		log.Printf("[内存缓存-LogServer] 读取缓存文件失败: %v", err)
+		logrus.Errorf("[内存缓存-LogServer] 读取缓存文件失败: %v", err)
 		return nil
 	}
 
 	//3.JSON反序列化
 	var obj model.LogServerObj
 	if err := json.Unmarshal(data, &obj); err != nil {
-		log.Printf("[内存缓存-LogServer] 解析缓存文件失败: %v", err)
+		logrus.Errorf("[内存缓存-LogServer] 解析缓存文件失败: %v", err)
 		return nil
 	}
 
@@ -190,26 +191,26 @@ func (m *LogServerCacheManager) saveToFile(obj *model.LogServerObj) {
 	//2.JSON序列化
 	data, err := json.MarshalIndent(obj, "", "  ")
 	if err != nil {
-		log.Printf("[内存缓存-LogServer] 序列化对象失败: %v", err)
+		logrus.Errorf("[内存缓存-LogServer] 序列化对象失败: %v", err)
 		return
 	}
 
 	//3.原子写入:先写临时文件
 	tempFile := m.cacheFile + ".tmp"
 	if err := os.WriteFile(tempFile, data, 0644); err != nil {
-		log.Printf("[内存缓存-LogServer] 写入临时文件失败: %v", err)
+		logrus.Errorf("[内存缓存-LogServer] 写入临时文件失败: %v", err)
 		return
 	}
 
 	//4.重命名为正式文件，如果失败，则清理临时文件
 	if err := os.Rename(tempFile, m.cacheFile); err != nil {
-		log.Printf("[内存缓存-LogServer] 重命名缓存文件失败: %v", err)
+		logrus.Errorf("[内存缓存-LogServer] 重命名缓存文件失败: %v", err)
 		os.Remove(tempFile)
 		return
 	}
 
 	//5.打印日志
-	log.Printf("[内存缓存-LogServer] 缓存文件保存成功: %s", m.cacheFile)
+	logrus.Debugf("[内存缓存-LogServer] 缓存文件保存成功: %s", m.cacheFile)
 }
 
 // updateCache 更新缓存
@@ -218,7 +219,7 @@ func (m *LogServerCacheManager) updateCache() {
 	//1.调用HTTP接口获取最新数据
 	obj, err := m.service.GetLogServerObj()
 	if err != nil {
-		log.Printf("[内存缓存-LogServer] 更新缓存失败: %v", err)
+		logrus.Errorf("[内存缓存-LogServer] 更新缓存失败: %v", err)
 		return
 	}
 
@@ -231,5 +232,5 @@ func (m *LogServerCacheManager) updateCache() {
 	m.saveToFile(obj)
 
 	//4.日志打印
-	log.Printf("[内存缓存-LogServer] 缓存更新成功")
+	logrus.Debugf("[内存缓存-LogServer] 缓存更新成功")
 }

@@ -4,10 +4,10 @@ package message
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"logging-mon-service/model"
 
 	"github.com/jinzhu/copier"
+	"github.com/sirupsen/logrus"
 )
 
 const (
@@ -38,7 +38,7 @@ func (r *routineLoadMessage) GetMessages(projectId int, logItems []model.LogItem
 		//2.消息转换
 		logMessage, err := r.toLogMessage(logItem, projectId)
 		if err != nil {
-			log.Printf("[上传日志] Doris Routine Load 转换日志失败: %v", err)
+			logrus.Errorf("[上传日志] Doris Routine Load 转换日志失败: %v", err)
 			continue
 		}
 
@@ -49,7 +49,7 @@ func (r *routineLoadMessage) GetMessages(projectId int, logItems []model.LogItem
 	//4.JSON序列化
 	messageByte, err := json.Marshal(logMessages)
 	if err != nil {
-		log.Printf("[上传日志] Doris Routine Load 序列化对象失败: %v", err)
+		logrus.Errorf("[上传日志] Doris Routine Load 序列化对象失败: %v", err)
 		return nil
 	}
 
@@ -105,7 +105,7 @@ func (r *routineLoadMessage) splitMessageByMaxLength(logMessages []*model.LogMes
 			if len(currentMessages) == 1 {
 
 				//8.打印日志
-				log.Printf("[上传日志] Doris Routine Load 单条消息超出最大%v字节限制", maxSize)
+				logrus.Warnf("[上传日志] Doris Routine Load 单条消息超出最大%v字节限制", maxSize)
 
 				//9.清空当前批次
 				currentMessages = make([]*model.LogMessage, 0)

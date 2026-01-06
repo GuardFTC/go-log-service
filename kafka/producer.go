@@ -21,7 +21,7 @@ func InitProducer(c *config.Config) {
 // CloseProducer 关闭生产者
 func CloseProducer() {
 	if err := GlobalProducer.Close(); err != nil {
-		logrus.Errorf("producer close error=>%v", err)
+		logrus.Errorf("[Kafka] Producer关闭失败:[%v]", err)
 	}
 }
 
@@ -41,7 +41,7 @@ func NewProducer(config *config.Config, c context.Context) *Producer {
 	}
 
 	//2.日志打印
-	logrus.Info("producer created success")
+	logrus.Info("[Kafka] Producer创建成功")
 
 	//3.返回
 	return producer
@@ -59,7 +59,7 @@ func (p *Producer) Close() error {
 	}
 
 	//3.否则打印日志，返回成功
-	logrus.Info("producer closed success")
+	logrus.Info("[Kafka] Producer关闭成功")
 	return nil
 }
 
@@ -110,7 +110,7 @@ func sendMessage(topic string, partition int, key string, message string, w *kaf
 	}
 
 	//4.打印日志
-	logrus.Infof("producer send message=>[topic=%s partition=%d key=%s] success", topic, partition, key)
+	logrus.Debugf("[Kafka] Producer 发送消息[topic=%s partition=%d key=%s]成功", topic, partition, key)
 
 	//5.默认返回
 	return nil
@@ -143,7 +143,7 @@ func sendMessageBatch(topic string, partition int, key string, messages []string
 	}
 
 	//7.打印日志
-	logrus.Infof("producer sent %d messages=>[topic=%s partition=%d key=%s] success", len(msgs), topic, partition, key)
+	logrus.Debugf("[Kafka] Producer 发送[%d]条消息:[topic=%s partition=%d key=%s]成功", len(msgs), topic, partition, key)
 
 	//8.默认返回
 	return nil

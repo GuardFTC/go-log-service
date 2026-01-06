@@ -2,8 +2,9 @@
 package nacos
 
 import (
-	"log"
 	"logging-mon-service/config"
+
+	"github.com/sirupsen/logrus"
 )
 
 // Nm 全局Nacos管理器
@@ -20,20 +21,20 @@ func InitNacosManager(c *config.Config) {
 
 	//3.异常不为空，打印日志，终止进程
 	if err != nil {
-		log.Fatalf("[Nacos] 初始化管理器失败: [%v]", err)
+		logrus.Fatalf("[Nacos] 初始化管理器失败: [%v]", err)
 	}
 }
 
 // RegisterService 注册服务
 func RegisterService() {
 	if err := Nm.RegisterService(); err != nil {
-		log.Fatalf("[Nacos] 注册服务失败: [%v]", err)
+		logrus.Fatalf("[Nacos] 注册服务失败: [%v]", err)
 	}
 }
 
 // DeregisterService 注销服务
 func DeregisterService() {
 	if err := Nm.DeregisterService(); err != nil {
-		log.Printf("[Nacos] 注销服务失败: [%v]", err)
+		logrus.Fatalf("[Nacos] 注销服务失败: [%v]", err)
 	}
 }

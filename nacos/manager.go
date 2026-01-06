@@ -3,7 +3,6 @@ package nacos
 
 import (
 	"fmt"
-	"log"
 	"logging-mon-service/config"
 
 	"github.com/nacos-group/nacos-sdk-go/v2/clients"
@@ -11,6 +10,7 @@ import (
 	"github.com/nacos-group/nacos-sdk-go/v2/common/constant"
 	"github.com/nacos-group/nacos-sdk-go/v2/model"
 	"github.com/nacos-group/nacos-sdk-go/v2/vo"
+	"github.com/sirupsen/logrus"
 )
 
 // NacosManager Nacos管理器
@@ -85,7 +85,7 @@ func (nm *NacosManager) RegisterService() error {
 	}
 
 	//3.打印日志
-	log.Printf("[Nacos] 服务注册成功: ip:[%s] port:[%d] serviceName:[%s] version:[%s]", nm.config.Server.IP, nm.config.Server.Port, nm.config.Server.Name, nm.config.Server.Version)
+	logrus.Infof("[Nacos] 服务注册成功: ip:[%s] port:[%d] serviceName:[%s] version:[%s]", nm.config.Server.IP, nm.config.Server.Port, nm.config.Server.Name, nm.config.Server.Version)
 
 	//4.默认返回空异常
 	return nil
@@ -112,7 +112,7 @@ func (nm *NacosManager) DeregisterService() error {
 	}
 
 	//3.打印日志
-	log.Printf("[Nacos] 服务注销成功: ip=[%s] port=[%d] serviceName=[%s] version=[%s]", nm.config.Server.IP, nm.config.Server.Port, nm.config.Server.Name, nm.config.Server.Version)
+	logrus.Infof("[Nacos] 服务注销成功: ip=[%s] port=[%d] serviceName=[%s] version=[%s]", nm.config.Server.IP, nm.config.Server.Port, nm.config.Server.Name, nm.config.Server.Version)
 
 	//4.默认返回空异常
 	return nil

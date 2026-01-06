@@ -5,7 +5,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"log"
 	"logging-mon-service/config"
 	"logging-mon-service/nacos"
 	"net/http"
@@ -13,6 +12,8 @@ import (
 	"os/signal"
 	"syscall"
 	"time"
+
+	"github.com/sirupsen/logrus"
 )
 
 // StartServer 启动服务
@@ -29,9 +30,9 @@ func StartServer(c *config.Config) {
 
 	//3.协程异步启动服务器
 	go func() {
-		log.Printf("[Server] 服务启动成功 监听端口: [%d]", c.Server.Port)
+		logrus.Infof("[Server] 服务启动成功 监听端口: [%d]", c.Server.Port)
 		if err := server.ListenAndServe(); err != nil && !errors.Is(http.ErrServerClosed, err) {
-			log.Fatalf("[Server] 启动服务器失败: [%v]", err)
+			logrus.Fatalf("[Server] 启动服务器失败: [%v]", err)
 		}
 	}()
 
@@ -53,7 +54,7 @@ func waitForShutdown(server *http.Server) {
 
 	//3.阻塞等待信号通道写入退出信号
 	<-quit
-	log.Println("[Server] 接收到关闭信号，开始优雅关闭...")
+	logrus.Infof("[Server] 接收到关闭信号，开始优雅关闭...")
 
 	//4.设置关闭超时时间
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
@@ -61,8 +62,8 @@ func waitForShutdown(server *http.Server) {
 
 	//5.关闭HTTP服务器，等待现有连接完成
 	if err := server.Shutdown(ctx); err != nil {
-		log.Printf("[Server] 强制关闭服务器: [%v]", err)
+		logrus.Errorf("[Server] 服务器关闭异常: [%v]", err)
 	} else {
-		log.Println("[Server] 服务器关闭成功")
+		logrus.Infof("[Server] 服务器关闭成功")
 	}
 }

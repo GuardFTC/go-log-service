@@ -3,7 +3,6 @@ package web
 
 import (
 	"fmt"
-	"log"
 	"logging-mon-service/commmon/cache"
 	"logging-mon-service/commmon/enum"
 	"logging-mon-service/commmon/util/message"
@@ -13,6 +12,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cast"
 )
 
@@ -58,7 +58,7 @@ func uploadLogs(logDto model.LogDto, projectId string, loggerId string, cfg *con
 	//1.获取项目
 	project := cache.GetProject(cast.ToInt(projectId))
 	if project == nil {
-		log.Printf("[上传日志] 项目[%v]不存在", projectId)
+		logrus.Errorf("[上传日志] 项目[%v]不存在", projectId)
 		return
 	}
 
@@ -80,7 +80,7 @@ func uploadLogs(logDto model.LogDto, projectId string, loggerId string, cfg *con
 
 	//6.为空直接返回
 	if len(logItems) == 0 {
-		log.Printf("[上传日志] 项目[%v]无符合日志级别的日志项", projectId)
+		logrus.Warnf("[上传日志] 项目[%v]无符合日志级别的日志项", projectId)
 		return
 	}
 
@@ -92,7 +92,7 @@ func uploadLogs(logDto model.LogDto, projectId string, loggerId string, cfg *con
 
 	//9.为空直接返回
 	if len(messages) == 0 {
-		log.Printf("[上传日志] 项目[%v]解析Kafka消息为空", projectId)
+		logrus.Warnf("[上传日志] 项目[%v]解析Kafka消息为空", projectId)
 		return
 	}
 
