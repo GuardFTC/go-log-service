@@ -26,8 +26,8 @@ type HandlerFactory struct {
 	handlerMap map[string]IMessage
 }
 
-// Init 初始化消息处理工厂
-func Init() {
+// InitMessageHandlerFactory 初始化消息处理工厂
+func InitMessageHandlerFactory() {
 
 	//1.初始化工厂
 	Factory = &HandlerFactory{

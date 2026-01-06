@@ -5,6 +5,7 @@ import (
 	"logging-mon-service/commmon/cache"
 	"logging-mon-service/commmon/util/message"
 	"logging-mon-service/config"
+	"logging-mon-service/kafka"
 	"logging-mon-service/nacos"
 	"logging-mon-service/web"
 )
@@ -21,9 +22,13 @@ func main() {
 	cache.InitLogServerCache()
 	defer cache.StopLogServerCache()
 
-	//4.初始化消息处理器
-	message.Init()
+	//4.初始化消息处理器工厂
+	message.InitMessageHandlerFactory()
 
-	//5.启动服务器
+	//5.初始化Kafka生产者
+	kafka.InitProducer(c)
+	defer kafka.CloseProducer()
+
+	//6.启动服务器
 	web.StartServer(c)
 }
