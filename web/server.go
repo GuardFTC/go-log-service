@@ -59,10 +59,7 @@ func waitForShutdown(server *http.Server) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	//5.将服务从Nacos注销
-	nacos.DeregisterService()
-
-	//6.关闭HTTP服务器，等待现有连接完成
+	//5.关闭HTTP服务器，等待现有连接完成
 	if err := server.Shutdown(ctx); err != nil {
 		log.Printf("[Server] 强制关闭服务器: [%v]", err)
 	} else {

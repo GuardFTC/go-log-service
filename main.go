@@ -15,19 +15,20 @@ func main() {
 	//1.加载配置
 	c := config.InitConfig()
 
-	//2.初始化Nacos管理器
-	nacos.InitNacosManager(c)
+	//2.初始化消息处理器工厂
+	message.InitMessageHandlerFactory()
 
 	//3.初始化日志服务缓存
 	cache.InitLogServerCache()
 	defer cache.StopLogServerCache()
 
-	//4.初始化消息处理器工厂
-	message.InitMessageHandlerFactory()
-
-	//5.初始化Kafka生产者
+	//4.初始化Kafka生产者
 	kafka.InitProducer(c)
 	defer kafka.CloseProducer()
+
+	//5.初始化Nacos管理器
+	nacos.InitNacosManager(c)
+	defer nacos.DeregisterService()
 
 	//6.启动服务器
 	web.StartServer(c)

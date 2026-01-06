@@ -18,7 +18,9 @@
     "handler_type": "routine_load"
   },
   "kafka": {
-    "brokers": ["localhost:9092"],
+    "brokers": [
+      "localhost:9092"
+    ],
     "async": false,
     "compression": "snappy",
     "balancer": "round_robin",
@@ -31,5 +33,9 @@
     "batch_bytes": 1048576,
     "dial_timeout": 5,
     "idle_timeout": 300
+  },
+  "log": {
+    "level": "info",
+    "color": true
   }
 }
