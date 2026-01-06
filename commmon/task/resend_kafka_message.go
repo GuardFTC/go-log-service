@@ -43,7 +43,7 @@ func newResendKafkaMessageTask(cfg *config.Config) *resendKafkaMessageTask {
 // Start 启动定时任务
 func (t *resendKafkaMessageTask) start() {
 	t.cron.Start()
-	logrus.Infof("[定时任务] 消息补发已启动，每小时01分执行")
+	logrus.Infof("[定时任务] 消息补发 已启动，每小时01分执行")
 }
 
 // Stop 停止定时任务

@@ -5,36 +5,24 @@ import (
 	"logging-mon-service/model"
 )
 
-// 全局缓存管理器实例
-var logServerCacheManager *LogServerCacheManager
+// GLobalServerCacheManager 全局缓存管理器实例
+var GLobalServerCacheManager *logServerCacheManager
 
 // InitLogServerCache 初始化日志服务缓存
 func InitLogServerCache() {
-
-	//1.创建缓存管理器
-	logServerCacheManager = NewLogServerCacheManager("logging-mon-server")
-
-	//2.启动定时更新任务
-	logServerCacheManager.Start()
-}
-
-// StopLogServerCache 停止日志服务缓存
-func StopLogServerCache() {
-	if logServerCacheManager != nil {
-		logServerCacheManager.Stop()
-	}
+	GLobalServerCacheManager = newLogServerCacheManager("logging-mon-server")
 }
 
 // GetProject 获取指定项目
 func GetProject(projectID int) *model.Project {
 
 	//1.如果缓存管理器未初始化，则返回nil
-	if logServerCacheManager == nil {
+	if GLobalServerCacheManager == nil {
 		return nil
 	}
 
 	//2.获取日志服务对象
-	obj := logServerCacheManager.GetLogServerObj()
+	obj := GLobalServerCacheManager.GetLogServerObj()
 	if obj == nil {
 		return nil
 	}

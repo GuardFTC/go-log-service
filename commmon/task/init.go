@@ -18,5 +18,7 @@ func InitTaskManager(cfg *config.Config) {
 
 // StopTaskManager 停止任务管理器
 func StopTaskManager() {
-	globalTaskManager.stopTasks()
+	if globalTaskManager != nil {
+		globalTaskManager.stopTasks()
+	}
 }

@@ -21,7 +21,6 @@ func main() {
 
 	//3.初始化日志服务缓存
 	cache.InitLogServerCache()
-	defer cache.StopLogServerCache()
 
 	//4.初始化Kafka生产者
 	kafka.InitProducer(c)

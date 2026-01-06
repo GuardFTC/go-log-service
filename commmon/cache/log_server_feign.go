@@ -1,4 +1,4 @@
-// Package task @Author:冯铁城 [17615007230@163.com] 2025-12-30 14:27:29
+// Package cache @Author:冯铁城 [17615007230@163.com] 2025-12-30 14:27:29
 package cache
 
 import (
@@ -6,20 +6,20 @@ import (
 	"logging-mon-service/model"
 )
 
-// LogServerService Server服务客户端
-type LogServerService struct {
+// logServerService Server服务客户端
+type logServerService struct {
 	client feign.ServiceClient
 }
 
-// NewLogServerService 创建Server服务客户端
-func NewLogServerService() *LogServerService {
-	return &LogServerService{
+// newLogServerService 创建Server服务客户端
+func newLogServerService() *logServerService {
+	return &logServerService{
 		client: feign.NewFeignClient("logging-mon-server"),
 	}
 }
 
-// GetLogServerObj 获取Server服务对象
-func (l *LogServerService) GetLogServerObj() (*model.LogServerObj, error) {
+// getLogServerObj 获取Server服务对象
+func (l *logServerService) getLogServerObj() (*model.LogServerObj, error) {
 
 	//1.定义result
 	var result model.LogServerObj

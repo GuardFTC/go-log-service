@@ -22,6 +22,7 @@ func newTaskManager(cfg *config.Config) *taskManager {
 
 	//2.加入任务
 	tasks = append(tasks, newResendKafkaMessageTask(cfg))
+	tasks = append(tasks, newSyncServerCacheTask())
 
 	//3.创建任务管理器，返回
 	return &taskManager{

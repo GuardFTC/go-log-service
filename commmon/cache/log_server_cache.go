@@ -14,10 +14,10 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-// LogServerCacheManager 日志服务缓存管理器
-type LogServerCacheManager struct {
+// logServerCacheManager 日志服务缓存管理器
+type logServerCacheManager struct {
 	cacheFile string              // 缓存文件路径
-	service   *LogServerService   // 服务客户端
+	service   *logServerService   // 服务客户端
 	cache     *model.LogServerObj // 内存缓存
 	mutex     sync.RWMutex        // 读写锁
 	ticker    *time.Ticker        // 定时器
@@ -25,8 +25,8 @@ type LogServerCacheManager struct {
 	cancel    context.CancelFunc  // 取消函数
 }
 
-// NewLogServerCacheManager 创建日志服务缓存管理器
-func NewLogServerCacheManager(serviceName string) *LogServerCacheManager {
+// newLogServerCacheManager 创建日志服务缓存管理器
+func newLogServerCacheManager(serviceName string) *logServerCacheManager {
 
 	//1.创建缓存文件
 	cacheFile := filepath.Join(os.TempDir(), fmt.Sprintf("LogServerObj-%s.json", serviceName))
@@ -35,9 +35,9 @@ func NewLogServerCacheManager(serviceName string) *LogServerCacheManager {
 	ctx, cancel := context.WithCancel(context.Background())
 
 	//3.创建日志服务缓存管理器
-	manager := &LogServerCacheManager{
+	manager := &logServerCacheManager{
 		cacheFile: cacheFile,
-		service:   NewLogServerService(),
+		service:   newLogServerService(),
 		ctx:       ctx,
 		cancel:    cancel,
 	}
@@ -51,45 +51,8 @@ func NewLogServerCacheManager(serviceName string) *LogServerCacheManager {
 
 //----------------------------------------------外部方法---------------------------------------------------//
 
-// Start 启动定时更新任务
-func (m *LogServerCacheManager) Start() {
-
-	//1.创建定时器,30s执行一次
-	m.ticker = time.NewTicker(30 * time.Second)
-
-	//2.创建协程，执行定时任务
-	go func() {
-		for {
-			select {
-			case <-m.ticker.C: //监听定时器chan，每30s执行一次
-				m.updateCache()
-			case <-m.ctx.Done(): //监听取消信号，如果取消，则退出
-				return
-			}
-		}
-	}()
-
-	//3.打印日志
-	logrus.Infof("[内存缓存-LogServer] 定时更新任务已启动，间隔30秒")
-}
-
-// Stop 停止定时更新任务
-func (m *LogServerCacheManager) Stop() {
-
-	//1.如果定时器不为nil，则停止
-	if m.ticker != nil {
-		m.ticker.Stop()
-	}
-
-	//2.调用上下文取消函数，让定时任务协程退出
-	m.cancel()
-
-	//3.打印日志
-	logrus.Infof("[内存缓存-LogServer] 定时更新任务已停止")
-}
-
 // GetLogServerObj 获取日志服务对象（从内存缓存）
-func (m *LogServerCacheManager) GetLogServerObj() *model.LogServerObj {
+func (m *logServerCacheManager) GetLogServerObj() *model.LogServerObj {
 
 	//1.加读锁，确保线程安全
 	m.mutex.RLock()
@@ -109,19 +72,41 @@ func (m *LogServerCacheManager) GetLogServerObj() *model.LogServerObj {
 }
 
 // GetCacheFilePath 获取缓存文件路径
-func (m *LogServerCacheManager) GetCacheFilePath() string {
+func (m *logServerCacheManager) GetCacheFilePath() string {
 	return m.cacheFile
 }
 
 // ForceUpdate 强制更新缓存
-func (m *LogServerCacheManager) ForceUpdate() {
-	m.updateCache()
+func (m *logServerCacheManager) ForceUpdate() {
+	m.UpdateCache()
+}
+
+// UpdateCache 更新缓存
+func (m *logServerCacheManager) UpdateCache() {
+
+	//1.调用HTTP接口获取最新数据
+	obj, err := m.service.getLogServerObj()
+	if err != nil {
+		logrus.Errorf("[内存缓存-LogServer] 更新缓存失败: %v", err)
+		return
+	}
+
+	//2.更新内存缓存，写操作加锁，确保线程安全
+	m.mutex.Lock()
+	m.cache = obj
+	m.mutex.Unlock()
+
+	//3.保存到文件
+	m.saveToFile(obj)
+
+	//4.日志打印
+	logrus.Debugf("[内存缓存-LogServer] 缓存更新成功")
 }
 
 //----------------------------------------------内部方法---------------------------------------------------//
 
 // initialize 初始化缓存
-func (m *LogServerCacheManager) initialize() {
+func (m *logServerCacheManager) initialize() {
 
 	//1.优先从文件读取
 	if obj := m.readFromFile(); obj != nil {
@@ -137,7 +122,7 @@ func (m *LogServerCacheManager) initialize() {
 	}
 
 	//4.文件读取失败，尝试从HTTP获取
-	if obj, err := m.service.GetLogServerObj(); err == nil {
+	if obj, err := m.service.getLogServerObj(); err == nil {
 
 		//5.内存缓存写操作加锁，确保线程安全
 		m.mutex.Lock()
@@ -155,7 +140,7 @@ func (m *LogServerCacheManager) initialize() {
 }
 
 // readFromFile 从文件读取缓存
-func (m *LogServerCacheManager) readFromFile() *model.LogServerObj {
+func (m *logServerCacheManager) readFromFile() *model.LogServerObj {
 
 	//1.检查文件是否存在
 	if _, err := os.Stat(m.cacheFile); os.IsNotExist(err) {
@@ -181,7 +166,7 @@ func (m *LogServerCacheManager) readFromFile() *model.LogServerObj {
 }
 
 // saveToFile 保存到文件
-func (m *LogServerCacheManager) saveToFile(obj *model.LogServerObj) {
+func (m *logServerCacheManager) saveToFile(obj *model.LogServerObj) {
 
 	//1.如果对象为nil，则返回
 	if obj == nil {
@@ -211,26 +196,4 @@ func (m *LogServerCacheManager) saveToFile(obj *model.LogServerObj) {
 
 	//5.打印日志
 	logrus.Debugf("[内存缓存-LogServer] 缓存文件保存成功: %s", m.cacheFile)
-}
-
-// updateCache 更新缓存
-func (m *LogServerCacheManager) updateCache() {
-
-	//1.调用HTTP接口获取最新数据
-	obj, err := m.service.GetLogServerObj()
-	if err != nil {
-		logrus.Errorf("[内存缓存-LogServer] 更新缓存失败: %v", err)
-		return
-	}
-
-	//2.更新内存缓存，写操作加锁，确保线程安全
-	m.mutex.Lock()
-	m.cache = obj
-	m.mutex.Unlock()
-
-	//3.保存到文件
-	m.saveToFile(obj)
-
-	//4.日志打印
-	logrus.Debugf("[内存缓存-LogServer] 缓存更新成功")
 }
