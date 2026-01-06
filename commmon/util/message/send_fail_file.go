@@ -32,7 +32,7 @@ func WriteMessageFileByHour(hour, message string) (string, error) {
 	//2.如果目录不存在，创建目录（包括父目录）
 	if _, err := os.Stat(hourDirPath); os.IsNotExist(err) {
 		if err = os.MkdirAll(hourDirPath, 0755); err != nil {
-			return "", fmt.Errorf("failed to create hour directory: %w", err)
+			return "", fmt.Errorf("failed to create hour directory [%s]: %w", hourDirPath, err)
 		}
 	}
 
@@ -44,7 +44,7 @@ func WriteMessageFileByHour(hour, message string) (string, error) {
 
 	//5.写入 UTF-8 文件
 	if err := os.WriteFile(filePath, []byte(message), 0644); err != nil {
-		return "", fmt.Errorf("failed to write message file: %w", err)
+		return "", fmt.Errorf("failed to write message file [%s]: %w", filePath, err)
 	}
 
 	//6.返回文件路径
@@ -61,13 +61,13 @@ func ReadMessageFiles(hour string) ([]string, error) {
 	if _, err := os.Stat(hourDirPath); os.IsNotExist(err) {
 		return []string{}, nil
 	} else if err != nil {
-		return nil, fmt.Errorf("failed to stat hour directory: %w", err)
+		return nil, fmt.Errorf("failed to stat hour directory [%s]: %w", hourDirPath, err)
 	}
 
 	//3.读取目录下所有文件
 	entries, err := os.ReadDir(hourDirPath)
 	if err != nil {
-		return nil, fmt.Errorf("failed to read hour directory: %w", err)
+		return nil, fmt.Errorf("failed to read hour directory [%s]: %w", hourDirPath, err)
 	}
 
 	//4.循环拼接文件路径
@@ -80,4 +80,31 @@ func ReadMessageFiles(hour string) ([]string, error) {
 
 	//5.返回文件列表
 	return files, nil
+}
+
+// DeleteMessageFiles 删除某小时目录下的所有消息文件
+func DeleteMessageFiles(hour string) error {
+
+	//1.拼接小时目录路径
+	hourDirPath := filepath.Join(messageDirPath, hour)
+
+	//2.判断目录是否存在
+	if _, err := os.Stat(hourDirPath); os.IsNotExist(err) {
+		return nil
+	} else if err != nil {
+		return fmt.Errorf("failed to stat hour directory [%s]: %w", hourDirPath, err)
+	}
+
+	//3.删除目录下所有文件
+	if err := os.RemoveAll(hourDirPath); err != nil {
+		return fmt.Errorf("failed to delete hour directory files [%s] : %w", hourDirPath, err)
+	}
+
+	//4.删除目录
+	if err := os.Remove(hourDirPath); err != nil {
+		return fmt.Errorf("failed to delete hour directory [%s]: %w", hourDirPath, err)
+	}
+
+	//5.默认返回
+	return nil
 }

@@ -3,6 +3,7 @@ package main
 
 import (
 	"logging-mon-service/commmon/cache"
+	"logging-mon-service/commmon/task"
 	"logging-mon-service/commmon/util/message"
 	"logging-mon-service/config"
 	"logging-mon-service/kafka"
@@ -30,6 +31,10 @@ func main() {
 	nacos.InitNacosManager(c)
 	defer nacos.DeregisterService()
 
-	//6.启动服务器
+	//6.初始化定时任务
+	task.InitTaskManager(c)
+	defer task.StopTaskManager()
+
+	//7.启动服务器
 	web.StartServer(c)
 }
