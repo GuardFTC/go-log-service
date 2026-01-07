@@ -35,7 +35,7 @@ func CalculateSign(normalizeRequestBody string, nonce string, timestamp string, 
 
 	//1.获取待签名字符串
 	stringToSign := fmt.Sprintf("body=%s&nonce=%s&timestamp=%s", normalizeRequestBody, nonce, timestamp)
-	logrus.Infof("[创建签名] 待签名字符串:[%s] 秘钥:[%s]", stringToSign, secretKey)
+	logrus.Debugf("[创建签名] 待签名字符串:[%s] 秘钥:[%s]", stringToSign, secretKey)
 
 	//2.使用HMac算法计算签名，返回
 	h := hmac.New(sha256.New, []byte(secretKey))
