@@ -4,12 +4,22 @@ package config
 import (
 	_ "embed"
 	"encoding/json"
+	"flag"
 
 	"github.com/sirupsen/logrus"
 )
 
-//go:embed properties/config-local.json
-var configData []byte
+// env 环境变量
+var env *string
+
+//go:embed properties/config-dev.json
+var configDevData []byte
+
+//go:embed properties/config-test.json
+var configTestData []byte
+
+//go:embed properties/config-prod.json
+var configProdData []byte
 
 // Config 应用配置
 type Config struct {
@@ -24,11 +34,8 @@ type Config struct {
 // InitConfig 初始化配置文件
 func InitConfig() *Config {
 
-	//1.解析内嵌配置文件
-	var config Config
-	if err := json.Unmarshal(configData, &config); err != nil {
-		logrus.Fatalf("[Config] 配置解析为JSON失败: %v", err)
-	}
+	//1.从配置文件解析配置
+	config := parseConfigFromConfigFile()
 
 	//2.解析服务器配置
 	if err := parseServerConfig(&config); err != nil {
@@ -51,6 +58,36 @@ func InitConfig() *Config {
 	parseWorkPoolConfig(&config)
 
 	//8.返回配置
-	logrus.Infof("[Config] 配置加载成功: [%+v]", config)
+	logrus.Infof("[Config] 环境:[%v] 配置加载成功: [%+v]", *env, config)
 	return &config
+}
+
+// parseConfigFromConfigFile 解析配置文件
+func parseConfigFromConfigFile() Config {
+
+	//1.解析命令行参数
+	env = flag.String("env", "dev", "运行环境 (dev|test|prod)")
+	flag.Parse()
+
+	//2.根据环境选择配置数据
+	var configData []byte
+	switch *env {
+	case "dev":
+		configData = configDevData
+	case "test":
+		configData = configTestData
+	case "prod":
+		configData = configProdData
+	default:
+		logrus.Fatalf("[Config] 不支持的环境:[%s], 支持的环境: dev|test|prod", *env)
+	}
+
+	//3.解析配置文件
+	var config Config
+	if err := json.Unmarshal(configData, &config); err != nil {
+		logrus.Fatalf("[Config] 配置解析为JSON失败:[%v]", err)
+	}
+
+	//4.返回配置
+	return config
 }

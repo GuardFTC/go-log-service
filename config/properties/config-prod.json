@@ -1,0 +1,47 @@
+{
+  "server": {
+    "name": "logging-mon-service-go",
+    "ip": "",
+    "port": 39801,
+    "version": "1.0.0"
+  },
+  "nacos": {
+    "server_addr": "127.0.0.1",
+    "server_port": 8848,
+    "namespace": "868e232c-e785-4ad9-8f11-de0a22a865ca",
+    "group": "DEFAULT_GROUP",
+    "timeout": 5000,
+    "log_dir": "./logs/nacos",
+    "cache_dir": "./cache/nacos"
+  },
+  "message": {
+    "handler_type": "routine_load"
+  },
+  "kafka": {
+    "brokers": [
+      "localhost:9092"
+    ],
+    "async": false,
+    "compression": "snappy",
+    "balancer": "round_robin",
+    "required_acks": -1,
+    "max_attempts": 5,
+    "write_timeout": 30,
+    "read_timeout": 10,
+    "batch_size": 100,
+    "batch_timeout": 100,
+    "batch_bytes": 1048576,
+    "dial_timeout": 5,
+    "idle_timeout": 300,
+    "topic": "logging_mon_logs_rl_json_go"
+  },
+  "log": {
+    "level": "info",
+    "color": true,
+    "format": "text"
+  },
+  "work_pool": {
+    "workers": 10000,
+    "max_jobs": 50000
+  }
+}
