@@ -15,8 +15,8 @@ type LogJob struct {
 }
 
 // NewLogJob 创建日志处理任务
-func NewLogJob(projectId string, loggerId string, logDto model.LogDto, cfg *config.Config) *LogJob {
-	return &LogJob{
+func NewLogJob(projectId string, loggerId string, logDto model.LogDto, cfg *config.Config) LogJob {
+	return LogJob{
 		ProjectId: projectId,
 		LoggerId:  loggerId,
 		LogDto:    logDto,

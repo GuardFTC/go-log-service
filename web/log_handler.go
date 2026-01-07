@@ -2,6 +2,7 @@
 package web
 
 import (
+	"logging-mon-service/commmon/work_pool"
 	"logging-mon-service/config"
 	"logging-mon-service/model"
 	"logging-mon-service/model/res"
@@ -35,7 +36,8 @@ func uploadLogsAsync(c *gin.Context, cfg *config.Config) {
 	loggerId := c.GetHeader("X-Logger-Id")
 
 	//5.上传日志
-	go logService.UploadLogs(logDto, projectId, loggerId, cfg)
+	logJob := work_pool.NewLogJob(projectId, loggerId, logDto, cfg)
+	work_pool.GlobalLogWorkerPool.Submit(logJob)
 
 	//6.返回
 	c.JSON(http.StatusOK, res.CreateSuccess(logDto))
