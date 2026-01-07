@@ -15,15 +15,15 @@ func initRouter(c *config.Config) *gin.Engine {
 
 	//2.绑定上传日志handler
 	logsGroup := router.Group("/api/logs")
+
+	//3.日志上传接口使用签名拦截器
+	logsGroup.Use(signInterceptor())
+
+	//4.定义上传日志路由
 	logsGroup.POST("", func(ctx *gin.Context) {
 		uploadLogsAsync(ctx, c)
 	})
 
-	//3.绑定获取服务列表handler
-	nacosGroup := router.Group("/api/nacos")
-	nacosGroup.GET("services", getServices)
-	nacosGroup.GET("services/:serviceName/instances", getServiceInstances)
-
-	//4.返回
+	//5.返回
 	return router
 }

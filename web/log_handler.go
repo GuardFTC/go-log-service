@@ -27,23 +27,16 @@ func uploadLogsAsync(c *gin.Context, cfg *config.Config) {
 
 	//2.获取参数
 	if err := c.ShouldBindJSON(&logDto); err != nil {
+		logrus.Warnf("[上传日志] 参数校验失败 err:[%v]", err)
 		c.JSON(http.StatusBadRequest, res.BadRequestFail(err.Error()))
 		return
 	}
 
 	//3.请求头获取项目ID以及日志器ID
 	projectId := c.GetHeader("X-Project-Id")
-	if projectId == "" {
-		c.JSON(http.StatusBadRequest, res.BadRequestFail("项目ID不能为空"))
-		return
-	}
 
 	//4.请求头获取日志器ID
 	loggerId := c.GetHeader("X-Logger-Id")
-	if loggerId == "" {
-		c.JSON(http.StatusBadRequest, res.BadRequestFail("日志器ID不能为空"))
-		return
-	}
 
 	//5.上传日志
 	uploadLogs(logDto, projectId, loggerId, cfg)
