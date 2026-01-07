@@ -2,6 +2,7 @@
 package model
 
 import (
+	"encoding/json"
 	"logging-mon-service/model/base"
 )
 
@@ -17,4 +18,10 @@ type LogItemDto struct {
 // LogDto 日志
 type LogDto struct {
 	LogItems []LogItemDto `json:"logItems" binding:"required,dive"`
+}
+
+// String 日志转字符串
+func (l *LogDto) String() string {
+	b, _ := json.Marshal(l)
+	return string(b)
 }
