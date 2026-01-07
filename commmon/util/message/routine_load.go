@@ -73,10 +73,17 @@ func (r *routineLoadMessage) toLogMessage(logItem model.LogItemDto, projectId in
 		return nil, err
 	}
 
-	//3.设置项目ID
+	//3.设置labels
+	if labelsStr, err := logItem.Labels.ToJSONString(); err != nil {
+		return nil, err
+	} else {
+		logMessage.Labels = labelsStr
+	}
+
+	//4.设置项目ID
 	logMessage.ProjectID = projectId
 
-	//4.返回
+	//5.返回
 	return logMessage, nil
 }
 

@@ -30,3 +30,12 @@ func (s *StringJSONArray) UnmarshalJSON(data []byte) error {
 	//4.返回
 	return nil
 }
+
+// ToJSONString 转换为JSON字符串
+func (s *StringJSONArray) ToJSONString() (string, error) {
+	data, err := json.Marshal(*s)
+	if err != nil {
+		return "", fmt.Errorf("failed to marshal to JSON string: %w", err)
+	}
+	return string(data), nil
+}
