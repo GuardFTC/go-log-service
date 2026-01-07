@@ -2,11 +2,14 @@
 package config
 
 import (
+	_ "embed"
 	"encoding/json"
-	"os"
 
 	"github.com/sirupsen/logrus"
 )
+
+//go:embed properties/config-local.json
+var configData []byte
 
 // Config 应用配置
 type Config struct {
@@ -21,40 +24,33 @@ type Config struct {
 // InitConfig 初始化配置文件
 func InitConfig() *Config {
 
-	//1.读取配置文件
-	file, err := os.Open("config/properties/config-local.json")
-	if err != nil {
-		logrus.Errorf("[Config] 配置文件读取失败: %v", err)
-	}
-	defer file.Close()
-
-	//2.解析为结构体
+	//1.解析内嵌配置文件
 	var config Config
-	if err = json.NewDecoder(file).Decode(&config); err != nil {
-		logrus.Errorf("[Config] 配置解析为JSON失败: %v", err)
+	if err := json.Unmarshal(configData, &config); err != nil {
+		logrus.Fatalf("[Config] 配置解析为JSON失败: %v", err)
 	}
 
-	//3.解析服务器配置
-	if err = parseServerConfig(&config); err != nil {
+	//2.解析服务器配置
+	if err := parseServerConfig(&config); err != nil {
 		logrus.Errorf("[Config] 解析服务器配置失败: %v", err)
 	}
 
-	//4.解析Nacos配置
+	//3.解析Nacos配置
 	parseNacosConfig(&config)
 
-	//5.解析消息配置
+	//4.解析消息配置
 	parseMessageConfig(&config)
 
-	//6.解析Kafka配置
+	//5.解析Kafka配置
 	parseKafkaConfig(&config)
 
-	//7.解析日志配置
+	//6.解析日志配置
 	parseLogConfig(&config)
 
-	//8.解析工作池配置
+	//7.解析工作池配置
 	parseWorkPoolConfig(&config)
 
-	//9.返回配置
+	//8.返回配置
 	logrus.Infof("[Config] 配置加载成功: [%+v]", config)
 	return &config
 }
