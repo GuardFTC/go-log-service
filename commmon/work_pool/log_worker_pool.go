@@ -60,7 +60,7 @@ func (p *LogWorkerPool) Start() {
 	}
 
 	//7.打印启动信息
-	logrus.Infof("[工作池-日志上传] 启动完成 工作协程个数:[%v]", p.workersNum)
+	logrus.Infof("[工作池-日志上传] 启动完成 工作协程个数:[%v] 最大队列长度:[%d]", p.workersNum, p.maxJobsNum)
 }
 
 // Stop 停止工作池

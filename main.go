@@ -5,6 +5,7 @@ import (
 	"logging-mon-service/commmon/cache"
 	"logging-mon-service/commmon/task"
 	"logging-mon-service/commmon/util/message"
+	"logging-mon-service/commmon/work_pool"
 	"logging-mon-service/config"
 	"logging-mon-service/kafka"
 	"logging-mon-service/nacos"
@@ -34,6 +35,10 @@ func main() {
 	task.InitTaskManager(c)
 	defer task.StopTaskManager()
 
-	//7.启动服务器
+	//7.初始化日志工作池
+	work_pool.InitLogWorkerPool(c.WorkPool.Workers, c.WorkPool.MaxJobs)
+	defer work_pool.CloseLogWorkerPool()
+
+	//8.启动服务器
 	web.StartServer(c)
 }

@@ -40,7 +40,7 @@ func (r *logWorker) exe() {
 
 			//4.如果任务异常，打印日志
 			if !ok {
-				logrus.Debugf("[工作池-日志上传] 工作协程[%d]任务通道关闭，退出", r.id)
+				logrus.Warnf("[工作池-日志上传] 工作协程[%d]任务通道关闭，退出", r.id)
 				return
 			}
 

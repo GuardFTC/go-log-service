@@ -39,5 +39,9 @@
     "level": "info",
     "color": true,
     "format": "text"
+  },
+  "work_pool": {
+    "workers": 10000,
+    "max_jobs": 50000
   }
 }
