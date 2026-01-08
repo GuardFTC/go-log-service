@@ -20,16 +20,16 @@ func main() {
 	//2.初始化消息处理器工厂
 	message.InitMessageHandlerFactory()
 
-	//3.初始化日志服务缓存
-	cache.InitLogServerCache()
-
-	//4.初始化Kafka生产者
+	//3.初始化Kafka生产者
 	kafka.InitProducer(c)
 	defer kafka.CloseProducer()
 
-	//5.初始化Nacos管理器
+	//4.初始化Nacos管理器
 	nacos.InitNacosManager(c)
 	defer nacos.DeregisterService()
+
+	//5.初始化日志服务缓存
+	cache.InitLogServerCache()
 
 	//6.初始化定时任务
 	task.InitTaskManager(c)

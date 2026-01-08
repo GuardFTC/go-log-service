@@ -135,7 +135,7 @@ func (m *logServerCacheManager) initialize() {
 		//7.打印日志，返回
 		logrus.Infof("[内存缓存-LogServer] 从HTTP接口初始化成功")
 	} else {
-		logrus.Errorf("[内存缓存-LogServer] 初始化失败:[%v]", err)
+		logrus.Fatalf("[内存缓存-LogServer] 初始化失败:[%v]", err)
 	}
 }
 
@@ -150,14 +150,14 @@ func (m *logServerCacheManager) readFromFile() *model.LogServerObj {
 	//2.读取文件内容
 	data, err := os.ReadFile(m.cacheFile)
 	if err != nil {
-		logrus.Errorf("[内存缓存-LogServer] 读取缓存文件失败: %v", err)
+		logrus.Fatalf("[内存缓存-LogServer] 读取缓存文件失败: %v", err)
 		return nil
 	}
 
 	//3.JSON反序列化
 	var obj model.LogServerObj
 	if err := json.Unmarshal(data, &obj); err != nil {
-		logrus.Errorf("[内存缓存-LogServer] 解析缓存文件失败: %v", err)
+		logrus.Fatalf("[内存缓存-LogServer] 解析缓存文件失败: %v", err)
 		return nil
 	}
 

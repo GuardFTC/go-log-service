@@ -20,7 +20,7 @@ func InitNacosManager(c *config.Config) {
 	Nm, err = NewNacosManager(c)
 
 	//3.异常不为空，打印日志，终止进程
-	if err != nil {
+	if err != nil || Nm == nil {
 		logrus.Fatalf("[Nacos] 初始化管理器失败: [%v]", err)
 	}
 }
